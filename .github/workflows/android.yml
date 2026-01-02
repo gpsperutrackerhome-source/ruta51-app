@@ -21,15 +21,12 @@ jobs:
       run: chmod +x gradlew
 
     - name: Build with Gradle
-      # Usamos configuraciones de memoria para evitar que el proceso se detenga
-      run: ./gradlew assembleRegularDebug -x lint -x test 
-      # --stacktrace --no-daemon
-      env:
-        _JAVA_OPTIONS: "-Xmx4g"
-        ORG_GRADLE_PROJECT_kotlin_daemon_jvm_options: "-Xmx2g"
+      # Compilamos la versión Regular que es la que no tiene errores
+      run: ./gradlew assembleRegularDebug -x lint -x test --no-daemon
 
-    - nname: Upload APK
+    - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
         name: ruta51-apk-final
-        path: app/build/outputs/apk/regular/debug/app-regular-debug.apk
+        # Esta ruta busca cualquier archivo .apk dentro de la carpeta build
+        path: app/build/outputs/apk/**/*.apk
