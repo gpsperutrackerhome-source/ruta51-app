@@ -21,8 +21,12 @@ jobs:
       run: chmod +x gradlew
 
     - name: Build with Gradle
-      # Usamos --no-daemon para mayor estabilidad en servidores virtuales
-      run: ./gradlew assembleDebug -x lint -x test --stacktrace --no-daemon
+      # Usamos configuraciones de memoria para evitar que el proceso se detenga
+      run: ./gradlew assembleRegularDebug -x lint -x test 
+      # --stacktrace --no-daemon
+      env:
+        _JAVA_OPTIONS: "-Xmx4g"
+        ORG_GRADLE_PROJECT_kotlin_daemon_jvm_options: "-Xmx2g"
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
