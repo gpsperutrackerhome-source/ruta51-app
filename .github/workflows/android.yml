@@ -1,4 +1,4 @@
-name: Android CI
+name: name: Build Ruta 51 Final
 
 on:
   push:
