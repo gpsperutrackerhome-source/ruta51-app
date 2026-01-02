@@ -20,13 +20,13 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
 
-    - name: Build with Gradle
-      # Compilamos la versión Regular que es la que no tiene errores
+    - name: Build Regular APK
       run: ./gradlew assembleRegularDebug -x lint -x test --no-daemon
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
-        name: ruta51-apk-final
-        # Esta ruta busca cualquier archivo .apk dentro de la carpeta build
-        path: app/build/outputs/apk/**/*.apk
+        name: Ruta51-Instalable
+        # Usamos una ruta directa para evitar que incluya carpetas vacías dentro del zip
+        path: app/build/outputs/apk/regular/debug/app-regular-debug.apk
+        if-no-files-found: error
