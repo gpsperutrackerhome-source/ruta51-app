@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">RUTA 51 PERU</string>
-    
+
     <string name="settings_url_default">http://174.138.55.128:8082</string>
     
     <bool name="settings_url_editable">false</bool>
