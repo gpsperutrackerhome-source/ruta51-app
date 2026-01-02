@@ -20,13 +20,20 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
 
-    - name: Build Regular APK
-      run: ./gradlew assembleRegularDebug -x lint -x test --no-daemon
+    - name: Build Release APK
+      run: ./gradlew assembleRegularRelease -x lint -x test --no-daemon
 
-    - name: Upload APK
+    - name: Sign APK
+      uses: r0adkll/sign-android-release@v1
+      with:
+        releaseDirectory: app/build/outputs/apk/regular/release
+        signingKeyBase64: ${{ secrets.SIGNING_KEY }}
+        alias: ${{ secrets.KEY_ALIAS }}
+        keyStorePassword: ${{ secrets.KEYSTORE_PASSWORD }}
+        keyPassword: ${{ secrets.KEY_PASSWORD }}
+
+    - name: Upload Release APK
       uses: actions/upload-artifact@v4
       with:
-        name: Ruta51-Instalable
-        # Usamos una ruta directa para evitar que incluya carpetas vacías dentro del zip
-        path: app/build/outputs/apk/regular/debug/app-regular-debug.apk
-        if-no-files-found: error
+        name: Ruta51-Oficial-Release
+        path: app/build/outputs/apk/regular/release/*.apk
