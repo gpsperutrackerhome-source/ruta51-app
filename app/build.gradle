@@ -1,8 +1,7 @@
 plugins {
     id 'com.android.application'
     id 'kotlin-android'
-    // id 'com.google.gms.google-services'
-    // id 'com.google.firebase.crashlytics'
+    id 'com.google.gms.google-services' // Activado para leer tu archivo json
 }
 
 android {
@@ -16,17 +15,6 @@ android {
         multiDexEnabled true
     }
     namespace 'org.traccar.manager'
-
-    buildFeatures {
-        flavorDimensions = ['default']
-    }
-    productFlavors {
-        regular {
-            isDefault = true
-            ext.enableCrashlytics = false
-        }
-        google
-    }
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
@@ -47,23 +35,12 @@ dependencies {
     implementation 'androidx.core:core-ktx:1.16.0'
     implementation 'androidx.biometric:biometric-ktx:1.2.0-alpha05'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    googleImplementation platform('com.google.firebase:firebase-bom:33.12.0')
-    googleImplementation 'com.google.firebase:firebase-analytics'
-    googleImplementation 'com.google.firebase:firebase-crashlytics'
-    googleImplementation 'com.google.firebase:firebase-messaging'
+    
+    // Firebase configurado para RUTA 51
+    implementation platform('com.google.firebase:firebase-bom:33.12.0')
+    implementation 'com.google.firebase:firebase-analytics'
+    implementation 'com.google.firebase:firebase-messaging'
 }
-tasks.register('copyFirebaseConfig', Copy) {
-    from '../../environment/google-services'
-    into '.'
-    include 'traccar-manager-android.json'
-    rename('traccar-manager-android.json', 'google-services.json')
-}
-afterEvaluate {
-    tasks.matching { it.name.contains('Google') }.configureEach { task ->
-        if (task.name.contains('Regular')) {
-            task.enabled false
-        } else {
-            task.dependsOn copyFirebaseConfig
-        }
-    }
-}
+
+// Hemos eliminado las tareas de "copyFirebaseConfig" y "afterEvaluate" 
+// porque ahora usarás tu propio archivo google-services.json directamente en la carpeta app.
