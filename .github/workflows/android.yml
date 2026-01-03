@@ -26,16 +26,18 @@ jobs:
     - name: Sign APK
       uses: r0adkll/sign-android-release@v1
       with:
-        releaseDirectory: app/build/outputs/apk/regular/release
+        # Corregido: Ya no existe la carpeta 'regular'
+        releaseDirectory: app/build/outputs/apk/release
         signingKeyBase64: ${{ secrets.SIGNING_KEY }}
         alias: ${{ secrets.KEY_ALIAS }}
         keyStorePassword: ${{ secrets.KEYSTORE_PASSWORD }}
         keyPassword: ${{ secrets.KEY_PASSWORD }}
       env:
-        BUILD_TOOLS_VERSION: "34.0.0" # Esto corrige el error de zipalign
+        BUILD_TOOLS_VERSION: "34.0.0"
 
     - name: Upload Release APK
       uses: actions/upload-artifact@v4
       with:
         name: Ruta51-Oficial-Release
-        path: app/build/outputs/apk/regular/release/*.apk
+        # Corregido: Ruta directa al APK generado
+        path: app/build/outputs/apk/release/*.apk
