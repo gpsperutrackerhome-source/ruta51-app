@@ -3,7 +3,7 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * You may obtain a copy of the Licese at
  *
  * http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -48,11 +48,15 @@ class MainFragment : WebViewFragment() {
                     SecurityManager.saveToken(activity, message.substring(6))
                 }
                 broadcastManager.sendBroadcast(Intent(EVENT_LOGIN))
+                // Forzamos registro de token al loguearse
+                registerNotificationToken()
             } else if (message.startsWith("authentication")) {
                 SecurityManager.readToken(activity) { token ->
                     if (token != null) {
                         val code = "handleLoginToken && handleLoginToken('$token')"
                         webView.evaluateJavascript(code, null)
+                        // Aseguramos que el servidor tenga el token de notificaciones
+                        registerNotificationToken()
                     }
                 }
             } else if (message.startsWith("logout")) {
@@ -95,7 +99,6 @@ class MainFragment : WebViewFragment() {
         val sharedPrefs = PreferenceManager.getDefaultSharedPreferences(activity)
         var url = sharedPrefs.getString(MainActivity.PREFERENCE_URL, null)
 
-        // Forzamos la IP de RUTA 51 si no hay una guardada para evitar la pantalla de Start
         if (url == null) {
             url = "http://174.138.55.128:8082"
             sharedPrefs.edit().putString(MainActivity.PREFERENCE_URL, url).apply()
@@ -112,9 +115,27 @@ class MainFragment : WebViewFragment() {
         }
     }
 
+    // FUNCIÓN DE REFUERZO: Envía el token al servidor Traccar
+    private fun registerNotificationToken() {
+        val sharedPrefs = PreferenceManager.getDefaultSharedPreferences(activity)
+        val token = sharedPrefs.getString(KEY_TOKEN, null)
+        if (token != null) {
+            val code = "updateNotificationToken && updateNotificationToken('$token')"
+            webView.evaluateJavascript(code, null)
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Forzamos registro de notificaciones y refresco de geocercas al volver a la App
+        registerNotificationToken()
+    }
+
     private val tokenBroadcastReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             val token = intent.getStringExtra(KEY_TOKEN)
+            // Guardamos localmente para persistencia
+            PreferenceManager.getDefaultSharedPreferences(context).edit().putString(KEY_TOKEN, token).apply()
             val code = "updateNotificationToken && updateNotificationToken('$token')"
             webView.evaluateJavascript(code, null)
         }
@@ -130,13 +151,11 @@ class MainFragment : WebViewFragment() {
         super.onStart()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
             ContextCompat.checkSelfPermission(activity, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-            if (!ActivityCompat.shouldShowRequestPermissionRationale(activity, Manifest.permission.POST_NOTIFICATIONS)) {
-                ActivityCompat.requestPermissions(
-                    activity,
-                    arrayOf(Manifest.permission.POST_NOTIFICATIONS),
-                    REQUEST_PERMISSIONS_NOTIFICATION
-                )
-            }
+            ActivityCompat.requestPermissions(
+                activity,
+                arrayOf(Manifest.permission.POST_NOTIFICATIONS),
+                REQUEST_PERMISSIONS_NOTIFICATION
+            )
         }
         broadcastManager.registerReceiver(tokenBroadcastReceiver, IntentFilter(EVENT_TOKEN))
         broadcastManager.registerReceiver(eventIdBroadcastReceiver, IntentFilter(EVENT_EVENT))
@@ -180,17 +199,17 @@ class MainFragment : WebViewFragment() {
     private var geolocationCallback: GeolocationPermissions.Callback? = null
 
     private val webViewClient = object : WebViewClient() {
-
         override fun onPageFinished(view: WebView?, url: String?) {
             super.onPageFinished(view, url)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 CookieManager.getInstance().flush()
             }
+            // Al terminar de cargar la página, aseguramos que el token se registre
+            registerNotificationToken()
         }
     }
 
     private val webChromeClient = object : WebChromeClient() {
-
         override fun onCreateWindow(view: WebView, isDialog: Boolean, isUserGesture: Boolean, resultMsg: Message): Boolean {
             val data = view.hitTestResult.extra
             return if (data != null) {
@@ -206,47 +225,18 @@ class MainFragment : WebViewFragment() {
             geolocationRequestOrigin = null
             geolocationCallback = null
             if (ContextCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                if (ActivityCompat.shouldShowRequestPermissionRationale(activity, Manifest.permission.ACCESS_FINE_LOCATION)) {
-                    AlertDialog.Builder(activity)
-                        .setMessage(R.string.permission_location_rationale)
-                        .setNeutralButton(android.R.string.ok) { _: DialogInterface?, _: Int ->
-                            geolocationRequestOrigin = origin
-                            geolocationCallback = callback
-                            ActivityCompat.requestPermissions(
-                                activity,
-                                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                                REQUEST_PERMISSIONS_LOCATION
-                            )
-                        }
-                        .show()
-                } else {
-                    geolocationRequestOrigin = origin
-                    geolocationCallback = callback
-                    ActivityCompat.requestPermissions(
-                        activity,
-                        arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                        REQUEST_PERMISSIONS_LOCATION
-                    )
-                }
+                geolocationRequestOrigin = origin
+                geolocationCallback = callback
+                ActivityCompat.requestPermissions(
+                    activity,
+                    arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                    REQUEST_PERMISSIONS_LOCATION
+                )
             } else {
                 callback.invoke(origin, true, false)
             }
         }
 
-        // Android 4.1+
-        @Suppress("UNUSED_PARAMETER")
-        fun openFileChooser(uploadMessage: ValueCallback<Uri?>?, acceptType: String?, capture: String?) {
-            openFileCallback = uploadMessage
-            val intent = Intent(Intent.ACTION_GET_CONTENT)
-            intent.addCategory(Intent.CATEGORY_OPENABLE)
-            intent.type = "*/*"
-            startActivityForResult(
-                Intent.createChooser(intent, getString(R.string.file_browser)),
-                REQUEST_FILE_CHOOSER
-            )
-        }
-
-        // Android 5.0+
         override fun onShowFileChooser(
             mWebView: WebView,
             filePathCallback: ValueCallback<Array<Uri>>,
@@ -254,14 +244,12 @@ class MainFragment : WebViewFragment() {
         ): Boolean {
             openFileCallback2?.onReceiveValue(null)
             openFileCallback2 = filePathCallback
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                val intent = fileChooserParams.createIntent()
-                try {
-                    startActivityForResult(intent, REQUEST_FILE_CHOOSER)
-                } catch (e: ActivityNotFoundException) {
-                    openFileCallback2 = null
-                    return false
-                }
+            val intent = fileChooserParams.createIntent()
+            try {
+                startActivityForResult(intent, REQUEST_FILE_CHOOSER)
+            } catch (e: ActivityNotFoundException) {
+                openFileCallback2 = null
+                return false
             }
             return true
         }
@@ -271,13 +259,12 @@ class MainFragment : WebViewFragment() {
         val request = DownloadManager.Request(Uri.parse(url))
         request.setMimeType(mimeType)
         request.addRequestHeader("cookie", CookieManager.getInstance().getCookie(url))
-        request.allowScanningByMediaScanner()
         request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
         request.setDestinationInExternalPublicDir(
             Environment.DIRECTORY_DOWNLOADS,
             URLUtil.guessFileName(url, contentDisposition, mimeType),
         )
-        val downloadManager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+        val downloadManager = activity.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
         downloadManager.enqueue(request)
     }
 
