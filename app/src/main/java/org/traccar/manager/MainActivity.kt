@@ -63,7 +63,7 @@ class MainActivity : AppCompatActivity() {
         
         // Forzamos la IP de RUTA 51 en las preferencias internas
         if (!sharedPrefs.contains(PREFERENCE_URL)) {
-            sharedPrefs.edit().putString(PREFERENCE_URL, "http://174.138.55.128:8082").apply()
+            sharedPrefs.edit().putString(PREFERENCE_URL, "https://ruta51.com").apply()
         }
 
         // Cargamos directamente MainFragment, ignorando por completo StartFragment

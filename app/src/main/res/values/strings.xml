@@ -1,17 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">RUTA 51 PERU</string>
 
-    <string name="settings_url_default">http://174.138.55.128:8082</string>
+    <string name="settings_url_default_value">https://ruta51.com</string>
+    
     <bool name="settings_url_editable">false</bool>
 
-
-    <string name="label_server">Server</string>
-    <string name="label_info">This screen will be shown only once. After you click the button, server address will be saved in preferences. To change it, clear app data from application manager.</string>
-    <string name="button_start">Start</string>
-    <string name="error_connection">Server connection failed</string>
-    <string name="file_browser">File Browser</string>
-    <string name="notification_channel">Default</string>
-    <string name="permission_location_rationale">App requires location permission to show current location on the map</string>
-    <string name="biometric_title">Biometric login</string>
-    <string name="biometric_cancel">Use account password</string>
+    <string name="label_server">Servidor RUTA 51</string>
+    <string name="label_info">Configurando conexión segura... Al presionar Iniciar, se guardará la dirección del servidor. Para cambiarla en el futuro, limpie los datos de la aplicación.</string>
+    <string name="button_start">Iniciar Seguimiento</string>
+    
+    <string name="error_connection">Error de conexión con RUTA 51. Verifique su internet.</string>
+    <string name="file_browser">Explorador de archivos</string>
+    <string name="notification_channel">Notificaciones RUTA 51</string>
+    <string name="permission_location_rationale">La aplicación requiere permiso de ubicación para mostrar su posición en el mapa y rastrear el vehículo.</string>
+    
+    <string name="biometric_title">Ingreso con Huella/Rostro</string>
+    <string name="biometric_cancel">Usar contraseña de cuenta</string>
 </resources>
