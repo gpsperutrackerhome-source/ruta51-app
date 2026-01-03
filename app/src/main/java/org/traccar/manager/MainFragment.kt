@@ -100,7 +100,7 @@ class MainFragment : WebViewFragment() {
         var url = sharedPrefs.getString(MainActivity.PREFERENCE_URL, null)
 
         if (url == null) {
-            url = "http://174.138.55.128:8082"
+            url = "https://ruta51.com"
             sharedPrefs.edit().putString(MainActivity.PREFERENCE_URL, url).apply()
         }
 
