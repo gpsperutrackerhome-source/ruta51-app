@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -43,11 +43,15 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initContent() {
-        if (PreferenceManager.getDefaultSharedPreferences(this).contains(PREFERENCE_URL)) {
-            fragmentManager.beginTransaction().add(android.R.id.content, MainFragment()).commit()
-        } else {
-            fragmentManager.beginTransaction().add(android.R.id.content, StartFragment()).commit()
+        val sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this)
+        
+        // Forzamos la IP de RUTA 51 en las preferencias internas
+        if (!sharedPrefs.contains(PREFERENCE_URL)) {
+            sharedPrefs.edit().putString(PREFERENCE_URL, "http://174.138.55.128:8082").apply()
         }
+
+        // Cargamos directamente MainFragment, ignorando por completo StartFragment
+        fragmentManager.beginTransaction().replace(android.R.id.content, MainFragment()).commit()
     }
 
     override fun onNewIntent(intent: Intent?) {
