@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -92,21 +92,23 @@ class MainFragment : WebViewFragment() {
     }
 
     private fun loadPage() {
-        val url = PreferenceManager.getDefaultSharedPreferences(activity)
-            .getString(MainActivity.PREFERENCE_URL, null)
-        if (url != null) {
-            val mainActivity = activity as? MainActivity
-            val eventId = mainActivity?.pendingEventId
-            mainActivity?.pendingEventId = null
-            if (eventId != null) {
-                webView.loadUrl("$url?eventId=$eventId")
-            } else {
-                webView.loadUrl(url)
-            }
+        val sharedPrefs = PreferenceManager.getDefaultSharedPreferences(activity)
+        var url = sharedPrefs.getString(MainActivity.PREFERENCE_URL, null)
+
+        // Forzamos la IP de RUTA 51 si no hay una guardada para evitar la pantalla de Start
+        if (url == null) {
+            url = "http://174.138.55.128:8082"
+            sharedPrefs.edit().putString(MainActivity.PREFERENCE_URL, url).apply()
+        }
+
+        val mainActivity = activity as? MainActivity
+        val eventId = mainActivity?.pendingEventId
+        mainActivity?.pendingEventId = null
+        
+        if (eventId != null) {
+            webView.loadUrl("$url?eventId=$eventId")
         } else {
-            activity.fragmentManager
-                .beginTransaction().replace(android.R.id.content, StartFragment())
-                .commitAllowingStateLoss()
+            webView.loadUrl(url!!)
         }
     }
 
