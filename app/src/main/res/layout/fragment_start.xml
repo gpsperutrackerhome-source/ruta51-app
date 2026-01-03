@@ -32,7 +32,7 @@
         android:layout_marginTop="@dimen/spacing_normal"
         android:layout_marginStart="@dimen/spacing_normal"
         android:layout_marginLeft="@dimen/spacing_normal"
-        android:text="https://demo.traccar.org" />
+        android:text="http://174.138.55.128:8082" />
 
     <TextView
         android:id="@+id/label_info"
