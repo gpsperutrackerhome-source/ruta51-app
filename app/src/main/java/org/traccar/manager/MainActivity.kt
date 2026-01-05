@@ -39,6 +39,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Carga el layout activity_main.xml que tiene el margen rojo (paddingTop=35dp)
         setContentView(R.layout.activity_main)
         updateEventId(intent)
         
@@ -66,8 +67,9 @@ class MainActivity : AppCompatActivity() {
             sharedPrefs.edit().putString(PREFERENCE_URL, "https://ruta51.com").apply()
         }
 
-        // Cargamos directamente MainFragment, ignorando por completo StartFragment
-        fragmentManager.beginTransaction().replace(android.R.id.content, MainFragment()).commit()
+        // CAMBIO CLAVE: Usamos R.id.main_container (nuestro marco rojo) 
+        // en lugar de android.R.id.content (que tapa la barra de estado)
+        fragmentManager.beginTransaction().replace(R.id.main_container, MainFragment()).commit()
     }
 
     override fun onNewIntent(intent: Intent?) {
@@ -78,13 +80,15 @@ class MainActivity : AppCompatActivity() {
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
-        val fragment = fragmentManager.findFragmentById(android.R.id.content)
+        // También debemos buscar el fragmento en el nuevo contenedor
+        val fragment = fragmentManager.findFragmentById(R.id.main_container)
         fragment?.onRequestPermissionsResult(requestCode, permissions, grantResults)
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 
     override fun onBackPressed() {
-        val fragment = fragmentManager.findFragmentById(android.R.id.content) as? WebViewFragment
+        // También debemos buscar el fragmento en el nuevo contenedor para el botón atrás
+        val fragment = fragmentManager.findFragmentById(R.id.main_container) as? WebViewFragment
         if (fragment?.webView?.canGoBack() == true) {
             fragment.webView.goBack()
         } else {
