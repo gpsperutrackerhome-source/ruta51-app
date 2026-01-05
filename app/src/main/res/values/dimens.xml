@@ -1,3 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="spacing_normal">16dp</dimen>
+
+    <dimen name="cardview_default_radius">8dp</dimen>
+    <dimen name="device_item_padding">12dp</dimen>
 </resources>

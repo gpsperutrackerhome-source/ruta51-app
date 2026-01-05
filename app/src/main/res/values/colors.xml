@@ -3,4 +3,9 @@
     <color name="primary">#E30613</color> 
     <color name="primary_dark">#B0050F</color>
     <color name="accent">#000000</color>
-</resources>
+
+    <color name="status_online">#4CAF50</color>    
+    <color name="status_offline">#9E9E9E</color>  
+     <color name="status_unknown">#FFC107</color>  
+      <color name="engine_on">#FF9800</color>      
+        </resources>
