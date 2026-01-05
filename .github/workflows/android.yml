@@ -3,6 +3,7 @@ name: Android CI
 on:
   push:
     branches: [ "main" ]
+  workflow_dispatch: # Agregado para que puedas ejecutarlo manualmente si quieres
 
 jobs:
   build:
@@ -26,11 +27,11 @@ jobs:
     - name: Sign APK
       uses: r0adkll/sign-android-release@v1
       with:
-        # Corregido: Ya no existe la carpeta 'regular'
         releaseDirectory: app/build/outputs/apk/release
-        signingKeyBase64: ${{ secrets.SIGNING_KEY }}
-        alias: ${{ secrets.KEY_ALIAS }}
-        keyStorePassword: ${{ secrets.KEYSTORE_PASSWORD }}
+        # AQUI ESTABAN LOS ERRORES, YA CORREGIDOS:
+        signingKeyBase64: ${{ secrets.STORE_FILE }}
+        alias: ${{ secrets.ALIAS }}
+        keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
         keyPassword: ${{ secrets.KEY_PASSWORD }}
       env:
         BUILD_TOOLS_VERSION: "34.0.0"
@@ -39,5 +40,4 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: Ruta51-Oficial-Release
-        # Corregido: Ruta directa al APK generado
         path: app/build/outputs/apk/release/*.apk

@@ -1,13 +1,13 @@
-name: Generar Keystore Ruta 51
-on:
-  workflow_dispatch:
+  name: Generar Keystore Ruta 51
+  on:
+    workflow_dispatch:
 
-jobs:
-  generate:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Crear Llave
-        run: |
-          keytool -genkey -v -keystore ruta51.jks -keyalg RSA -keysize 2048 -validity 10000 -alias ruta51 -storepass @123Morris -keypass @123Morris -dname "CN=Ruta 51, OU=Desarrollo, O=Ruta51Peru, L=Lima, S=Lima, C=PE"
-          echo "TU CODIGO SIGNING_KEY ES EL SIGUIENTE:"
-          base64 ruta51.jks
+  jobs:
+    generate:
+      runs-on: ubuntu-latest
+      steps:
+        - name: Crear Llave
+          run: |
+            keytool -genkey -v -keystore ruta51.jks -keyalg RSA -keysize 2048 -validity 10000 -alias ruta51 -storepass @123Morris -keypass @123Morris -dname "CN=Ruta 51, OU=Desarrollo, O=Ruta51Peru, L=Lima, S=Lima, C=PE"
+            echo "TU CODIGO SIGNING_KEY ES EL SIGUIENTE:"
+            base64 -w 0 ruta51.jks
